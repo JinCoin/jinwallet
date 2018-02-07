@@ -17,19 +17,19 @@ import (
 
 	flags "github.com/jessevdk/go-flags"
 	"github.com/lightninglabs/neutrino"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/internal/cfgutil"
-	"github.com/roasbeef/btcwallet/internal/legacy/keystore"
-	"github.com/roasbeef/btcwallet/netparams"
-	"github.com/roasbeef/btcwallet/wallet"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/internal/cfgutil"
+	"github.com/JinCoin/jinwallet/internal/legacy/keystore"
+	"github.com/JinCoin/jinwallet/netparams"
+	"github.com/JinCoin/jinwallet/wallet"
 )
 
 const (
-	defaultCAFilename       = "btcd.cert"
-	defaultConfigFilename   = "btcwallet.conf"
+	defaultCAFilename       = "jind.cert"
+	defaultConfigFilename   = "jinwallet.conf"
 	defaultLogLevel         = "info"
 	defaultLogDirname       = "logs"
-	defaultLogFilename      = "btcwallet.log"
+	defaultLogFilename      = "jinwallet.log"
 	defaultRPCMaxClients    = 10
 	defaultRPCMaxWebsockets = 25
 
@@ -37,8 +37,8 @@ const (
 )
 
 var (
-	btcdDefaultCAFile  = filepath.Join(btcutil.AppDataDir("btcd", false), "rpc.cert")
-	defaultAppDataDir  = btcutil.AppDataDir("btcwallet", false)
+	btcdDefaultCAFile  = filepath.Join(jinutil.AppDataDir("jind", false), "rpc.cert")
+	defaultAppDataDir  = jinutil.AppDataDir("jinwallet", false)
 	defaultConfigFile  = filepath.Join(defaultAppDataDir, defaultConfigFilename)
 	defaultRPCKeyFile  = filepath.Join(defaultAppDataDir, "rpc.key")
 	defaultRPCCertFile = filepath.Join(defaultAppDataDir, "rpc.cert")
@@ -52,7 +52,7 @@ type config struct {
 	Create        bool                    `long:"create" description:"Create the wallet if it does not exist"`
 	CreateTemp    bool                    `long:"createtemp" description:"Create a temporary simulation wallet (pass=password) in the data directory indicated; must call with --datadir"`
 	AppDataDir    *cfgutil.ExplicitString `short:"A" long:"appdata" description:"Application data directory for wallet config, databases and logs"`
-	TestNet3      bool                    `long:"testnet" description:"Use the test Bitcoin network (version 3) (default mainnet)"`
+	TestNet3      bool                    `long:"testnet" description:"Use the test jincoin network (version 3) (default mainnet)"`
 	SimNet        bool                    `long:"simnet" description:"Use the simulation test network (default mainnet)"`
 	NoInitialLoad bool                    `long:"noinitialload" description:"Defer wallet creation/opening on startup and enable loading wallets over RPC"`
 	DebugLevel    string                  `short:"d" long:"debuglevel" description:"Logging level {trace, debug, info, warn, error, critical}"`
@@ -63,11 +63,11 @@ type config struct {
 	WalletPass string `long:"walletpass" default-mask:"-" description:"The public wallet password -- Only required if the wallet was created with one"`
 
 	// RPC client options
-	RPCConnect       string                  `short:"c" long:"rpcconnect" description:"Hostname/IP and port of btcd RPC server to connect to (default localhost:8334, testnet: localhost:18334, simnet: localhost:18556)"`
-	CAFile           *cfgutil.ExplicitString `long:"cafile" description:"File containing root certificates to authenticate a TLS connections with btcd"`
+	RPCConnect       string                  `short:"c" long:"rpcconnect" description:"Hostname/IP and port of jind RPC server to connect to (default localhost:23100, testnet: localhost:33100, simnet: localhost:18556)"`
+	CAFile           *cfgutil.ExplicitString `long:"cafile" description:"File containing root certificates to authenticate a TLS connections with jind"`
 	DisableClientTLS bool                    `long:"noclienttls" description:"Disable TLS for the RPC client -- NOTE: This is only allowed if the RPC client is connecting to localhost"`
-	BtcdUsername     string                  `long:"btcdusername" description:"Username for btcd authentication"`
-	BtcdPassword     string                  `long:"btcdpassword" default-mask:"-" description:"Password for btcd authentication"`
+	BtcdUsername     string                  `long:"btcdusername" description:"Username for jind authentication"`
+	BtcdPassword     string                  `long:"btcdpassword" default-mask:"-" description:"Password for jind authentication"`
 	Proxy            string                  `long:"proxy" description:"Connect via SOCKS5 proxy (eg. 127.0.0.1:9050)"`
 	ProxyUser        string                  `long:"proxyuser" description:"Username for proxy server"`
 	ProxyPass        string                  `long:"proxypass" default-mask:"-" description:"Password for proxy server"`
@@ -92,11 +92,11 @@ type config struct {
 	RPCKey                 *cfgutil.ExplicitString `long:"rpckey" description:"File containing the certificate key"`
 	OneTimeTLSKey          bool                    `long:"onetimetlskey" description:"Generate a new TLS certpair at startup, but only write the certificate to disk"`
 	DisableServerTLS       bool                    `long:"noservertls" description:"Disable TLS for the RPC server -- NOTE: This is only allowed if the RPC server is bound to localhost"`
-	LegacyRPCListeners     []string                `long:"rpclisten" description:"Listen for legacy RPC connections on this interface/port (default port: 8332, testnet: 18332, simnet: 18554)"`
+	LegacyRPCListeners     []string                `long:"rpclisten" description:"Listen for legacy RPC connections on this interface/port (default port: 23098, testnet: 33098, simnet: 18554)"`
 	LegacyRPCMaxClients    int64                   `long:"rpcmaxclients" description:"Max number of legacy RPC clients for standard connections"`
 	LegacyRPCMaxWebsockets int64                   `long:"rpcmaxwebsockets" description:"Max number of legacy RPC websocket connections"`
-	Username               string                  `short:"u" long:"username" description:"Username for legacy RPC and btcd authentication (if btcdusername is unset)"`
-	Password               string                  `short:"P" long:"password" default-mask:"-" description:"Password for legacy RPC and btcd authentication (if btcdpassword is unset)"`
+	Username               string                  `short:"u" long:"username" description:"Username for legacy RPC and jind authentication (if btcdusername is unset)"`
+	Password               string                  `short:"P" long:"password" default-mask:"-" description:"Password for legacy RPC and jind authentication (if btcdpassword is unset)"`
 
 	// EXPERIMENTAL RPC server options
 	//
@@ -250,7 +250,7 @@ func parseAndSetDebugLevels(debugLevel string) error {
 //      3) Load configuration file overwriting defaults with any specified options
 //      4) Parse CLI options and overwrite/add any specified options
 //
-// The above results in btcwallet functioning properly without any config
+// The above results in jinwallet functioning properly without any config
 // settings while still allowing the user to override settings with config files
 // and command line options.  Command line options always take precedence.
 func loadConfig() (*config, []string, error) {
@@ -534,12 +534,12 @@ func loadConfig() (*config, []string, error) {
 				return nil, nil, err
 			}
 		} else {
-			// If CAFile is unset, choose either the copy or local btcd cert.
+			// If CAFile is unset, choose either the copy or local jind cert.
 			if !cfg.CAFile.ExplicitlySet() {
 				cfg.CAFile.Value = filepath.Join(cfg.AppDataDir.Value, defaultCAFilename)
 
 				// If the CA copy does not exist, check if we're connecting to
-				// a local btcd and switch to its RPC cert if it exists.
+				// a local jind and switch to its RPC cert if it exists.
 				certExists, err := cfgutil.FileExists(cfg.CAFile.Value)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
@@ -646,10 +646,10 @@ func loadConfig() (*config, []string, error) {
 	cfg.RPCCert.Value = cleanAndExpandPath(cfg.RPCCert.Value)
 	cfg.RPCKey.Value = cleanAndExpandPath(cfg.RPCKey.Value)
 
-	// If the btcd username or password are unset, use the same auth as for
-	// the client.  The two settings were previously shared for btcd and
+	// If the jind username or password are unset, use the same auth as for
+	// the client.  The two settings were previously shared for jind and
 	// client auth, so this avoids breaking backwards compatibility while
-	// allowing users to use different auth settings for btcd and wallet.
+	// allowing users to use different auth settings for jind and wallet.
 	if cfg.BtcdUsername == "" {
 		cfg.BtcdUsername = cfg.Username
 	}

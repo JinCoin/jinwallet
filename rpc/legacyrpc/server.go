@@ -19,9 +19,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcwallet/chain"
-	"github.com/roasbeef/btcwallet/wallet"
+	"github.com/JinCoin/jind/btcjson"
+	"github.com/JinCoin/jinwallet/chain"
+	"github.com/JinCoin/jinwallet/wallet"
 	"github.com/btcsuite/websocket"
 )
 
@@ -81,7 +81,7 @@ type Server struct {
 
 // jsonAuthFail sends a message back to the client if the http auth is rejected.
 func jsonAuthFail(w http.ResponseWriter) {
-	w.Header().Add("WWW-Authenticate", `Basic realm="btcwallet RPC"`)
+	w.Header().Add("WWW-Authenticate", `Basic realm="jinwallet RPC"`)
 	http.Error(w, "401 Unauthorized.", http.StatusUnauthorized)
 }
 
@@ -255,7 +255,7 @@ func (s *Server) Stop() {
 }
 
 // SetChainServer sets the chain server client component needed to run a fully
-// functional bitcoin wallet RPC server.  This can be called to enable RPC
+// functional jincoin wallet RPC server.  This can be called to enable RPC
 // passthrough even before a loaded wallet is set, but the wallet's RPC client
 // is preferred.
 func (s *Server) SetChainServer(chainClient chain.Interface) {
@@ -265,8 +265,8 @@ func (s *Server) SetChainServer(chainClient chain.Interface) {
 }
 
 // handlerClosure creates a closure function for handling requests of the given
-// method.  This may be a request that is handled directly by btcwallet, or
-// a chain server request that is handled by passing the request down to btcd.
+// method.  This may be a request that is handled directly by jinwallet, or
+// a chain server request that is handled by passing the request down to jind.
 //
 // NOTE: These handlers do not handle special cases, such as the authenticate
 // method.  Each of these must be checked beforehand (the method is already
@@ -462,7 +462,7 @@ out:
 			switch req.Method {
 			case "stop":
 				resp := makeResponse(req.ID,
-					"btcwallet stopping.", nil)
+					"jinwallet stopping.", nil)
 				mresp, err := json.Marshal(resp)
 				// Expected to never fail.
 				if err != nil {
@@ -606,7 +606,7 @@ func (s *Server) postClientRPC(w http.ResponseWriter, r *http.Request) {
 		return
 	case "stop":
 		stop = true
-		res = "btcwallet stopping"
+		res = "jinwallet stopping"
 	default:
 		res, jsonErr = s.handlerClosure(&req)()
 	}

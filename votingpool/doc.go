@@ -3,12 +3,12 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package votingpool provides voting pool functionality for btcwallet.
+Package votingpool provides voting pool functionality for jinwallet.
 
 Overview
 
 The purpose of the voting pool package is to make it possible to store
-bitcoins using m-of-n multisig transactions. A pool can have multiple
+jincoins using m-of-n multisig transactions. A pool can have multiple
 series, each of them with a set of pubkeys (one for each of the members
 in that pool's series) and the minimum number of required signatures (m)
 needed to spend the pool's coins. Each member will hold a private key

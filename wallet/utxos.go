@@ -6,9 +6,9 @@
 package wallet
 
 import (
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcwallet/walletdb"
+	"github.com/JinCoin/jind/txscript"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinwallet/walletdb"
 )
 
 // OutputSelectionPolicy describes the rules for selecting an output from the

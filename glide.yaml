@@ -1,8 +1,8 @@
-package: github.com/roasbeef/btcwallet
+package: github.com/JinCoin/jinwallet
 import:
 - package: github.com/boltdb/bolt
   version: ^1.3.0
-- package: github.com/roasbeef/btcd
+- package: github.com/JinCoin/jind
   version: 9978b939c33973be19b932fa7b936079bb7ba38d
   subpackages:
   - blockchain
@@ -13,7 +13,7 @@ import:
   - txscript
   - wire
 - package: github.com/btcsuite/btclog
-- package: github.com/roasbeef/btcutil
+- package: github.com/JinCoin/jinutil
   version: c3ff179366044979fb9856c2feb79bd4c2184c7a
   subpackages:
   - hdkeychain

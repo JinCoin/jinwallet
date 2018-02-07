@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package wtxmgr provides an implementation of a transaction database handling
-// spend tracking for a bitcoin wallet.  Its primary purpose is to save
+// spend tracking for a jincoin wallet.  Its primary purpose is to save
 // transactions with outputs spendable with wallet keys and transactions that
 // are signed by wallet keys in memory, handle spend tracking for unspent
 // outputs and newly-inserted transactions, and report the spendable balance

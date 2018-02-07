@@ -5,9 +5,9 @@
 package txsizes
 
 import (
-	"github.com/roasbeef/btcd/wire"
+	"github.com/JinCoin/jind/wire"
 
-	h "github.com/roasbeef/btcwallet/internal/helpers"
+	h "github.com/JinCoin/jinwallet/internal/helpers"
 )
 
 // Worst case script and input/output size estimates.

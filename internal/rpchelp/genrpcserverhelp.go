@@ -12,8 +12,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcwallet/internal/rpchelp"
+	"github.com/JinCoin/jind/btcjson"
+	"github.com/JinCoin/jinwallet/internal/rpchelp"
 )
 
 var outputFile = func() *os.File {

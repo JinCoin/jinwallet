@@ -11,11 +11,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/roasbeef/btcd/btcec"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcutil"
+	"github.com/JinCoin/jind/btcec"
+	"github.com/JinCoin/jind/chaincfg"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/txscript"
+	"github.com/JinCoin/jinutil"
 
 	"github.com/davecgh/go-spew/spew"
 )
@@ -255,7 +255,7 @@ func TestChaining(t *testing.T) {
 			return
 		}
 
-		// Public keys (used to generate the bitcoin address) MUST match.
+		// Public keys (used to generate the jincoin address) MUST match.
 		if !bytes.Equal(nextPubUncompressedFromPriv, nextPubUncompressedFromPub) {
 			t.Errorf("%s: Uncompressed public keys do not match.", test.name)
 		}
@@ -578,7 +578,7 @@ func TestWatchingWalletExport(t *testing.T) {
 
 	// Test that ExtendActiveAddresses for the watching wallet match
 	// manually requested addresses of the original wallet.
-	var newAddrs []btcutil.Address
+	var newAddrs []jinutil.Address
 	for i := 0; i < 10; i++ {
 		addr, err := w.NextChainedAddress(createdAt)
 		if err != nil {
@@ -665,7 +665,7 @@ func TestWatchingWalletExport(t *testing.T) {
 		return
 	}
 	pk, _ := btcec.PrivKeyFromBytes(btcec.S256(), make([]byte, 32))
-	wif, err := btcutil.NewWIF(pk, tstNetParams, true)
+	wif, err := jinutil.NewWIF(pk, tstNetParams, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -704,7 +704,7 @@ func TestImportPrivateKey(t *testing.T) {
 	}
 
 	// import priv key
-	wif, err := btcutil.NewWIF((*btcec.PrivateKey)(pk), tstNetParams, false)
+	wif, err := jinutil.NewWIF((*btcec.PrivateKey)(pk), tstNetParams, false)
 	if err != nil {
 		t.Fatal(err)
 	}

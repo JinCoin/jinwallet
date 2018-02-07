@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/lightninglabs/neutrino"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/rpcclient"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/rpcclient"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
 // NeutrinoClient is an implementation of the btcwalet chain.Interface interface.
@@ -94,7 +94,7 @@ func (s *NeutrinoClient) WaitForShutdown() {
 func (s *NeutrinoClient) GetBlock(hash *chainhash.Hash) (*wire.MsgBlock, error) {
 	// TODO(roasbeef): add a block cache?
 	//  * which evication strategy? depends on use case
-	//  Should the block cache be INSIDE neutrino instead of in btcwallet?
+	//  Should the block cache be INSIDE neutrino instead of in jinwallet?
 	block, err := s.CS.GetBlockFromNetwork(*hash)
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (s *NeutrinoClient) SendRawTransaction(tx *wire.MsgTx, allowHighFees bool) 
 }
 
 // Rescan replicates the RPC client's Rescan command.
-func (s *NeutrinoClient) Rescan(startHash *chainhash.Hash, addrs []btcutil.Address,
+func (s *NeutrinoClient) Rescan(startHash *chainhash.Hash, addrs []jinutil.Address,
 	outPoints []*wire.OutPoint) error {
 	s.clientMtx.Lock()
 	defer s.clientMtx.Unlock()
@@ -241,14 +241,14 @@ func (s *NeutrinoClient) NotifyBlocks() error {
 	// start a rescan without watching any addresses.
 	if !s.scanning {
 		s.clientMtx.Unlock()
-		return s.NotifyReceived([]btcutil.Address{})
+		return s.NotifyReceived([]jinutil.Address{})
 	}
 	s.clientMtx.Unlock()
 	return nil
 }
 
 // NotifyReceived replicates the RPC client's NotifyReceived command.
-func (s *NeutrinoClient) NotifyReceived(addrs []btcutil.Address) error {
+func (s *NeutrinoClient) NotifyReceived(addrs []jinutil.Address) error {
 	s.clientMtx.Lock()
 
 	// If we have a rescan running, we just need to add the appropriate
@@ -303,7 +303,7 @@ func (s *NeutrinoClient) SetStartTime(startTime time.Time) {
 // onFilteredBlockConnected sends appropriate notifications to the notification
 // channel.
 func (s *NeutrinoClient) onFilteredBlockConnected(height int32,
-	header *wire.BlockHeader, relevantTxs []*btcutil.Tx) {
+	header *wire.BlockHeader, relevantTxs []*jinutil.Tx) {
 	ntfn := FilteredBlockConnected{
 		Block: &wtxmgr.BlockMeta{
 			Block: wtxmgr.Block{

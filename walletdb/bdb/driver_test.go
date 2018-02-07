@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/roasbeef/btcwallet/walletdb"
-	_ "github.com/roasbeef/btcwallet/walletdb/bdb"
+	"github.com/JinCoin/jinwallet/walletdb"
+	_ "github.com/JinCoin/jinwallet/walletdb/bdb"
 )
 
 // dbType is the database type name for this driver.

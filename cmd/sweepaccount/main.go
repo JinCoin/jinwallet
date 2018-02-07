@@ -13,20 +13,20 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/rpcclient"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/internal/cfgutil"
-	"github.com/roasbeef/btcwallet/netparams"
-	"github.com/roasbeef/btcwallet/wallet/txauthor"
-	"github.com/roasbeef/btcwallet/wallet/txrules"
+	"github.com/JinCoin/jind/btcjson"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/rpcclient"
+	"github.com/JinCoin/jind/txscript"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/internal/cfgutil"
+	"github.com/JinCoin/jinwallet/netparams"
+	"github.com/JinCoin/jinwallet/wallet/txauthor"
+	"github.com/JinCoin/jinwallet/wallet/txrules"
 )
 
 var (
-	walletDataDirectory = btcutil.AppDataDir("btcwallet", false)
+	walletDataDirectory = jinutil.AppDataDir("jinwallet", false)
 	newlineBytes        = []byte{'\n'}
 )
 
@@ -42,8 +42,8 @@ func errContext(err error, context string) error {
 
 // Flags.
 var opts = struct {
-	TestNet3              bool                `long:"testnet" description:"Use the test bitcoin network (version 3)"`
-	SimNet                bool                `long:"simnet" description:"Use the simulation bitcoin network"`
+	TestNet3              bool                `long:"testnet" description:"Use the test jincoin network (version 3)"`
+	SimNet                bool                `long:"simnet" description:"Use the simulation jincoin network"`
 	RPCConnect            string              `short:"c" long:"connect" description:"Hostname[:port] of wallet RPC server"`
 	RPCUsername           string              `short:"u" long:"rpcuser" description:"Wallet RPC username"`
 	RPCCertificateFile    string              `long:"cafile" description:"Wallet RPC TLS certificate"`
@@ -81,7 +81,7 @@ func init() {
 	}
 
 	if opts.TestNet3 && opts.SimNet {
-		fatalf("Multiple bitcoin networks may not be used simultaneously")
+		fatalf("Multiple jincoin networks may not be used simultaneously")
 	}
 	var activeNet = &netparams.MainNetParams
 	if opts.TestNet3 {
@@ -140,12 +140,12 @@ func (noInputValue) Error() string { return "no input value" }
 // looked up again by the wallet during the call to signrawtransaction.
 func makeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
 	var (
-		totalInputValue btcutil.Amount
+		totalInputValue jinutil.Amount
 		inputs          = make([]*wire.TxIn, 0, len(outputs))
 		sourceErr       error
 	)
 	for _, output := range outputs {
-		outputAmount, err := btcutil.NewAmount(output.Amount)
+		outputAmount, err := jinutil.NewAmount(output.Amount)
 		if err != nil {
 			sourceErr = fmt.Errorf(
 				"invalid amount `%v` in listunspent result",
@@ -178,7 +178,7 @@ func makeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
 		sourceErr = noInputValue{}
 	}
 
-	return func(btcutil.Amount) (btcutil.Amount, []*wire.TxIn, [][]byte, error) {
+	return func(jinutil.Amount) (jinutil.Amount, []*wire.TxIn, [][]byte, error) {
 		return totalInputValue, inputs, nil, sourceErr
 	}
 }
@@ -257,7 +257,7 @@ func sweep() error {
 		}
 	}
 
-	var totalSwept btcutil.Amount
+	var totalSwept jinutil.Amount
 	var numErrors int
 	var reportError = func(format string, args ...interface{}) {
 		fmt.Fprintf(os.Stderr, format, args...)
@@ -300,7 +300,7 @@ func sweep() error {
 			continue
 		}
 
-		outputAmount := btcutil.Amount(tx.Tx.TxOut[0].Value)
+		outputAmount := jinutil.Amount(tx.Tx.TxOut[0].Value)
 		fmt.Printf("Swept %v to destination account with transaction %v\n",
 			outputAmount, txHash)
 		totalSwept += outputAmount
@@ -330,8 +330,8 @@ func promptSecret(what string) (string, error) {
 	return string(input), nil
 }
 
-func saneOutputValue(amount btcutil.Amount) bool {
-	return amount >= 0 && amount <= btcutil.MaxSatoshi
+func saneOutputValue(amount jinutil.Amount) bool {
+	return amount >= 0 && amount <= jinutil.MaxSatoshi
 }
 
 func parseOutPoint(input *btcjson.ListUnspentResult) (wire.OutPoint, error) {

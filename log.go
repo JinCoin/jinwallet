@@ -13,12 +13,12 @@ import (
 	"github.com/btcsuite/btclog"
 	"github.com/jrick/logrotate/rotator"
 	"github.com/lightninglabs/neutrino"
-	"github.com/roasbeef/btcd/rpcclient"
-	"github.com/roasbeef/btcwallet/chain"
-	"github.com/roasbeef/btcwallet/rpc/legacyrpc"
-	"github.com/roasbeef/btcwallet/rpc/rpcserver"
-	"github.com/roasbeef/btcwallet/wallet"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/rpcclient"
+	"github.com/JinCoin/jinwallet/chain"
+	"github.com/JinCoin/jinwallet/rpc/legacyrpc"
+	"github.com/JinCoin/jinwallet/rpc/rpcserver"
+	"github.com/JinCoin/jinwallet/wallet"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
 // logWriter implements an io.Writer that outputs to both standard output and

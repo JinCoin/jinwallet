@@ -46,7 +46,7 @@ imports:
   - headerfs
 - name: github.com/lightninglabs/gozmq
   version: 0d266ba6d55ea65c18c7a02d8992c89355149e80
-- name: github.com/roasbeef/btcd
+- name: github.com/JinCoin/jind
   version: 9978b939c33973be19b932fa7b936079bb7ba38d
   subpackages:
   - addrmgr
@@ -61,7 +61,7 @@ imports:
   - rpcclient
   - txscript
   - wire
-- name: github.com/roasbeef/btcutil
+- name: github.com/JinCoin/jinutil
   version: c3ff179366044979fb9856c2feb79bd4c2184c7a
   subpackages:
   - base58

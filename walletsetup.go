@@ -11,16 +11,16 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/roasbeef/btcd/btcec"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/internal/legacy/keystore"
-	"github.com/roasbeef/btcwallet/internal/prompt"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/wallet"
-	"github.com/roasbeef/btcwallet/walletdb"
-	_ "github.com/roasbeef/btcwallet/walletdb/bdb"
+	"github.com/JinCoin/jind/btcec"
+	"github.com/JinCoin/jind/chaincfg"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/internal/legacy/keystore"
+	"github.com/JinCoin/jinwallet/internal/prompt"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/wallet"
+	"github.com/JinCoin/jinwallet/walletdb"
+	_ "github.com/JinCoin/jinwallet/walletdb/bdb"
 )
 
 // networkDir returns the directory name of a network directory to hold wallet
@@ -60,7 +60,7 @@ func convertLegacyKeystore(legacyKeyStore *keystore.Store, w *wallet.Wallet) err
 				continue
 			}
 
-			wif, err := btcutil.NewWIF((*btcec.PrivateKey)(privKey),
+			wif, err := jinutil.NewWIF((*btcec.PrivateKey)(privKey),
 				netParams, addr.Compressed())
 			if err != nil {
 				fmt.Printf("WARN: Failed to create wallet "+

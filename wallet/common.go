@@ -8,9 +8,9 @@ package wallet
 import (
 	"time"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinutil"
 )
 
 // Note: The following common types should never reference the Wallet type.
@@ -78,10 +78,10 @@ type P2SHMultiSigOutput struct {
 	// fetching other Transactionoutput data together with the rest of the
 	// multisig info.
 	OutPoint        wire.OutPoint
-	OutputAmount    btcutil.Amount
+	OutputAmount    jinutil.Amount
 	ContainingBlock BlockIdentity
 
-	P2SHAddress  *btcutil.AddressScriptHash
+	P2SHAddress  *jinutil.AddressScriptHash
 	RedeemScript []byte
 	M, N         uint8           // M of N signatures required to redeem
 	Redeemer     *OutputRedeemer // nil unless spent

@@ -7,11 +7,11 @@ package wallet
 import (
 	"bytes"
 
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcwallet/chain"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/walletdb"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/txscript"
+	"github.com/JinCoin/jinwallet/chain"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/walletdb"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
 func (w *Wallet) handleChainNotifications() {
@@ -38,7 +38,7 @@ func (w *Wallet) handleChainNotifications() {
 		// TODO(aakselrod): There's a race conditon here, which
 		// happens when a reorg occurs between the
 		// rescanProgress notification and the last GetBlockHash
-		// call. The solution when using btcd is to make btcd
+		// call. The solution when using jind is to make jind
 		// send blockconnected notifications with each block
 		// the way Neutrino does, and get rid of the loop. The
 		// other alternative is to check the final hash and,

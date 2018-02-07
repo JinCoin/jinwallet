@@ -9,16 +9,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/rpcclient"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/btcjson"
+	"github.com/JinCoin/jind/chaincfg"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/rpcclient"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
-// RPCClient represents a persistent client connection to a bitcoin RPC server
+// RPCClient represents a persistent client connection to a jincoin RPC server
 // for information regarding the current best block chain.
 type RPCClient struct {
 	*rpcclient.Client
@@ -40,7 +40,7 @@ type RPCClient struct {
 // connect string.  If disableTLS is false, the remote RPC certificate must be
 // provided in the certs slice.  The connection is not established immediately,
 // but must be done using the Start method.  If the remote server does not
-// operate on the same bitcoin network as described by the passed chain
+// operate on the same jincoin network as described by the passed chain
 // parameters, the connection will be disconnected.
 func NewRPCClient(chainParams *chaincfg.Params, connect, user, pass string, certs []byte,
 	disableTLS bool, reconnectAttempts int) (*RPCClient, error) {
@@ -86,7 +86,7 @@ func NewRPCClient(chainParams *chaincfg.Params, connect, user, pass string, cert
 
 // BackEnd returns the name of the driver.
 func (c *RPCClient) BackEnd() string {
-	return "btcd"
+	return "jind"
 }
 
 // Start attempts to establish a client connection with the remote server.
@@ -145,7 +145,7 @@ func (c *RPCClient) WaitForShutdown() {
 }
 
 // Notifications returns a channel of parsed notifications sent by the remote
-// bitcoin RPC server.  This channel must be continually read or the process
+// jincoin RPC server.  This channel must be continually read or the process
 // may abort for running out memory, as unread notifications are queued for
 // later reads.
 func (c *RPCClient) Notifications() <-chan interface{} {
@@ -217,7 +217,7 @@ func (c *RPCClient) onBlockDisconnected(hash *chainhash.Hash, height int32, time
 	}
 }
 
-func (c *RPCClient) onRecvTx(tx *btcutil.Tx, block *btcjson.BlockDetails) {
+func (c *RPCClient) onRecvTx(tx *jinutil.Tx, block *btcjson.BlockDetails) {
 	blk, err := parseBlock(block)
 	if err != nil {
 		// Log and drop improper notification.
@@ -237,7 +237,7 @@ func (c *RPCClient) onRecvTx(tx *btcutil.Tx, block *btcjson.BlockDetails) {
 	}
 }
 
-func (c *RPCClient) onRedeemingTx(tx *btcutil.Tx, block *btcjson.BlockDetails) {
+func (c *RPCClient) onRedeemingTx(tx *jinutil.Tx, block *btcjson.BlockDetails) {
 	// Handled exactly like recvtx notifications.
 	c.onRecvTx(tx, block)
 }
@@ -337,7 +337,7 @@ out:
 			// TODO: A minute timeout is used to prevent the handler loop from
 			// blocking here forever, but this is much larger than it needs to
 			// be due to dcrd processing websocket requests synchronously (see
-			// https://github.com/roasbeef/btcd/issues/504).  Decrease this to
+			// https://github.com/JinCoin/jind/issues/504).  Decrease this to
 			// something saner like 3s when the above issue is fixed.
 			type sessionResult struct {
 				err error

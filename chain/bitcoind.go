@@ -10,18 +10,18 @@ import (
 	"time"
 
 	"github.com/lightninglabs/gozmq"
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/rpcclient"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/btcjson"
+	"github.com/JinCoin/jind/chaincfg"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/rpcclient"
+	"github.com/JinCoin/jind/txscript"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
-// BitcoindClient represents a persistent client connection to a bitcoind server
+// BitcoindClient represents a persistent client connection to a jincoind server
 // for information regarding the current best block chain.
 type BitcoindClient struct {
 	client      *rpcclient.Client
@@ -57,7 +57,7 @@ type BitcoindClient struct {
 // connect string.  If disableTLS is false, the remote RPC certificate must be
 // provided in the certs slice.  The connection is not established immediately,
 // but must be done using the Start method.  If the remote server does not
-// operate on the same bitcoin network as described by the passed chain
+// operate on the same jincoin network as described by the passed chain
 // parameters, the connection will be disconnected.
 func NewBitcoindClient(chainParams *chaincfg.Params, connect, user, pass,
 	zmqConnect string, zmqPollInterval time.Duration) (*BitcoindClient,
@@ -97,10 +97,10 @@ func NewBitcoindClient(chainParams *chaincfg.Params, connect, user, pass,
 
 // BackEnd returns the name of the driver.
 func (c *BitcoindClient) BackEnd() string {
-	return "bitcoind"
+	return "jincoind"
 }
 
-// GetCurrentNet returns the network on which the bitcoind instance is running.
+// GetCurrentNet returns the network on which the jincoind instance is running.
 func (c *BitcoindClient) GetCurrentNet() (wire.BitcoinNet, error) {
 	hash, err := c.client.GetBlockHash(0)
 	if err != nil {
@@ -119,7 +119,7 @@ func (c *BitcoindClient) GetCurrentNet() (wire.BitcoinNet, error) {
 	}
 }
 
-// GetBestBlock returns the highest block known to bitcoind.
+// GetBestBlock returns the highest block known to jincoind.
 func (c *BitcoindClient) GetBestBlock() (*chainhash.Hash, int32, error) {
 	bcinfo, err := c.client.GetBlockChainInfo()
 	if err != nil {
@@ -187,7 +187,7 @@ func (c *BitcoindClient) GetTxOut(txHash *chainhash.Hash, index uint32,
 }
 
 // NotifyReceived updates the watch list with the passed addresses.
-func (c *BitcoindClient) NotifyReceived(addrs []btcutil.Address) error {
+func (c *BitcoindClient) NotifyReceived(addrs []jinutil.Address) error {
 	select {
 	case c.rescanUpdate <- addrs:
 	case <-c.quit:
@@ -219,7 +219,7 @@ func (c *BitcoindClient) NotifyBlocks() error {
 }
 
 // LoadTxFilter updates the transaction watchlists for the client. Acceptable
-// arguments after `reset` are any combination of []btcutil.Address,
+// arguments after `reset` are any combination of []jinutil.Address,
 // []wire.OutPoint, []*wire.OutPoint, []chainhash.Hash, and []*chainhash.Hash.
 func (c *BitcoindClient) LoadTxFilter(reset bool,
 	watchLists ...interface{}) error {
@@ -249,7 +249,7 @@ func (c *BitcoindClient) LoadTxFilter(reset bool,
 			sendList(list)
 		case []*wire.OutPoint:
 			sendList(list)
-		case []btcutil.Address:
+		case []jinutil.Address:
 			sendList(list)
 		case []chainhash.Hash:
 			sendList(list)
@@ -271,14 +271,14 @@ func (c *BitcoindClient) RescanBlocks(blockHashes []chainhash.Hash) (
 	for _, hash := range blockHashes {
 		header, err := c.GetBlockHeaderVerbose(&hash)
 		if err != nil {
-			log.Warnf("Unable to get header %s from bitcoind: %s",
+			log.Warnf("Unable to get header %s from jincoind: %s",
 				hash, err)
 			continue
 		}
 
 		block, err := c.GetBlock(&hash)
 		if err != nil {
-			log.Warnf("Unable to get block %s from bitcoind: %s",
+			log.Warnf("Unable to get block %s from jincoind: %s",
 				hash, err)
 			continue
 		}
@@ -305,7 +305,7 @@ func (c *BitcoindClient) RescanBlocks(blockHashes []chainhash.Hash) (
 // Rescan rescans from the block with the given hash until the current block,
 // after adding the passed addresses and outpoints to the client's watch list.
 func (c *BitcoindClient) Rescan(blockHash *chainhash.Hash,
-	addrs []btcutil.Address, outPoints []*wire.OutPoint) error {
+	addrs []jinutil.Address, outPoints []*wire.OutPoint) error {
 
 	if blockHash == nil {
 		return errors.New("rescan requires a starting block hash")
@@ -335,7 +335,7 @@ func (c *BitcoindClient) Rescan(blockHash *chainhash.Hash,
 	return nil
 }
 
-// SendRawTransaction sends a raw transaction via bitcoind.
+// SendRawTransaction sends a raw transaction via jincoind.
 func (c *BitcoindClient) SendRawTransaction(tx *wire.MsgTx,
 	allowHighFees bool) (*chainhash.Hash, error) {
 
@@ -401,7 +401,7 @@ func (c *BitcoindClient) WaitForShutdown() {
 }
 
 // Notifications returns a channel of parsed notifications sent by the remote
-// bitcoin RPC server.  This channel must be continually read or the process
+// jincoin RPC server.  This channel must be continually read or the process
 // may abort for running out memory, as unread notifications are queued for
 // later reads.
 func (c *BitcoindClient) Notifications() <-chan interface{} {
@@ -412,7 +412,7 @@ func (c *BitcoindClient) Notifications() <-chan interface{} {
 // using this object. Since only a single rescan at a time is currently
 // supported, only one birthday needs to be set. This does not fully restart a
 // running rescan, so should not be used to update a rescan while it is running.
-// TODO: When factoring out to multiple rescans per bitcoind client, add a
+// TODO: When factoring out to multiple rescans per jincoind client, add a
 // birthday per client.
 func (c *BitcoindClient) SetStartTime(startTime time.Time) {
 	c.clientMtx.Lock()
@@ -514,7 +514,7 @@ func (c *BitcoindClient) onRescanFinished(hash *chainhash.Hash, height int32, bl
 }
 
 // socketHandler reads events from the ZMQ socket, processes them as
-// appropriate, and queues them as btcd or neutrino would.
+// appropriate, and queues them as jind or neutrino would.
 func (c *BitcoindClient) socketHandler(zmqClient *gozmq.Conn) {
 	defer c.wg.Done()
 	defer zmqClient.Close()
@@ -534,7 +534,7 @@ mainLoop:
 	selectLoop:
 		for {
 			// Check for any requests before we poll events from
-			// bitcoind.
+			// jincoind.
 			select {
 
 			// Quit if requested
@@ -552,7 +552,7 @@ mainLoop:
 					c.watchOutPoints =
 						make(map[wire.OutPoint]struct{})
 					c.clientMtx.Unlock()
-				case []btcutil.Address:
+				case []jinutil.Address:
 					// We're updating monitored addresses.
 					c.clientMtx.Lock()
 					for _, addr := range e {
@@ -604,7 +604,7 @@ mainLoop:
 			}
 		}
 
-		// Now, poll events from bitcoind.
+		// Now, poll events from jincoind.
 		msgBytes, err := zmqClient.Receive()
 		if err != nil {
 			switch e := err.(type) {
@@ -676,7 +676,7 @@ mainLoop:
 func (c *BitcoindClient) reorg(bs *waddrmgr.BlockStamp, block *wire.MsgBlock) error {
 	// We rewind until we find a common ancestor between the known chain
 	//and the current chain, and then fast forward again. This relies on
-	// being able to fetch both from bitcoind; to change that would require
+	// being able to fetch both from jincoind; to change that would require
 	// changes in downstream code.
 	// TODO: Make this more robust in order not to rely on this behavior.
 	log.Infof("Possible reorg at block %s", block.BlockHash())
@@ -750,7 +750,7 @@ func (c *BitcoindClient) reorg(bs *waddrmgr.BlockStamp, block *wire.MsgBlock) er
 	return nil
 }
 
-// rescan performs a rescan of the chain using a bitcoind back-end, from the
+// rescan performs a rescan of the chain using a jincoind back-end, from the
 // specified hash to the best-known hash, while watching out for reorgs that
 // happen during the rescan. It uses the addresses and outputs being tracked
 // by the client in the watch list. This is called only within a queue
@@ -782,7 +782,7 @@ func (c *BitcoindClient) rescan(hash *chainhash.Hash) error {
 	defer c.onRescanFinished(lastHash, lastHeader.Height, time.Unix(
 		lastHeader.Time, 0))
 
-	// Cycle through all of the blocks known to bitcoind, being mindful of
+	// Cycle through all of the blocks known to jincoind, being mindful of
 	// reorgs.
 	for i := firstHeader.Height + 1; i <= bestBlock.Height; i++ {
 		// Get the block at the current height.
@@ -791,7 +791,7 @@ func (c *BitcoindClient) rescan(hash *chainhash.Hash) error {
 			return err
 		}
 
-		// This relies on the fact that bitcoind returns blocks from
+		// This relies on the fact that jincoind returns blocks from
 		// non-best chains it knows about.
 		// TODO: Make this more robust in order to not rely on this
 		// behavior.
@@ -961,7 +961,7 @@ func (c *BitcoindClient) filterTx(tx *wire.MsgTx,
 	blockDetails *btcjson.BlockDetails, notify bool) (bool,
 	*wtxmgr.TxRecord, error) {
 
-	txDetails := btcutil.NewTx(tx)
+	txDetails := jinutil.NewTx(tx)
 	if blockDetails != nil {
 		txDetails.SetIndex(blockDetails.Index)
 	}

@@ -11,11 +11,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/roasbeef/btcutil/hdkeychain"
-	vp "github.com/roasbeef/btcwallet/votingpool"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/walletdb"
-	_ "github.com/roasbeef/btcwallet/walletdb/bdb"
+	"github.com/JinCoin/jinutil/hdkeychain"
+	vp "github.com/JinCoin/jinwallet/votingpool"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/walletdb"
+	_ "github.com/JinCoin/jinwallet/walletdb/bdb"
 )
 
 func TestLoadPoolAndDepositScript(t *testing.T) {

@@ -3,25 +3,25 @@ package chain
 import (
 	"time"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/waddrmgr"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinutil"
+	"github.com/JinCoin/jinwallet/waddrmgr"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
 // BackEnds returns a list of the available back ends.
 // TODO: Refactor each into a driver and use dynamic registration.
 func BackEnds() []string {
 	return []string{
-		"bitcoind",
-		"btcd",
+		"jincoind",
+		"jind",
 		"neutrino",
 	}
 }
 
 // Interface allows more than one backing blockchain source, such as a
-// btcd RPC chain server, or an SPV library, as long as we write a driver for
+// jind RPC chain server, or an SPV library, as long as we write a driver for
 // it.
 type Interface interface {
 	Start() error
@@ -33,8 +33,8 @@ type Interface interface {
 	GetBlockHeader(*chainhash.Hash) (*wire.BlockHeader, error)
 	BlockStamp() (*waddrmgr.BlockStamp, error)
 	SendRawTransaction(*wire.MsgTx, bool) (*chainhash.Hash, error)
-	Rescan(*chainhash.Hash, []btcutil.Address, []*wire.OutPoint) error
-	NotifyReceived([]btcutil.Address) error
+	Rescan(*chainhash.Hash, []jinutil.Address, []*wire.OutPoint) error
+	NotifyReceived([]jinutil.Address) error
 	NotifyBlocks() error
 	Notifications() <-chan interface{}
 	BackEnd() string

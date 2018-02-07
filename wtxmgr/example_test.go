@@ -7,11 +7,11 @@ package wtxmgr_test
 import (
 	"fmt"
 
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcwallet/walletdb"
-	"github.com/roasbeef/btcwallet/wtxmgr"
+	"github.com/JinCoin/jind/chaincfg"
+	"github.com/JinCoin/jind/chaincfg/chainhash"
+	"github.com/JinCoin/jind/wire"
+	"github.com/JinCoin/jinwallet/walletdb"
+	"github.com/JinCoin/jinwallet/wtxmgr"
 )
 
 var (
